@@ -1,5 +1,13 @@
 # Slack Bot
 
+Not Production ready ! MVP code that requires a complete revamp
+
+# Setup 
+- Python 3.8 
+- Model downloaded instructions https://python.langchain.com/docs/integrations/llms/gpt4all 
+- Setup App on Slack with relevant permissions
+- Add variables to .env
+- `python main.py` To start slack bolt
 
 
 ## Getting started
