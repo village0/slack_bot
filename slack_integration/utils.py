@@ -4,11 +4,12 @@ from slack_integration.constants import (
     REGENERATE_RESPONSE_EPHEMERAL,
     REGENERATE_RESPONSE_MESSAGE,
 )
+from llm_integration.llm import get_llm_answer
 
 
 def get_ai_response(question):
-    """Generate a response from the AI."""
-    return f"This is the response from AI {question}"
+    """Returns a response from the LLM."""
+    return get_llm_answer(question)
 
 
 def create_button_block(text, action_id, value):

@@ -18,6 +18,18 @@ def askai(ack, command, client):
             logging.exception(f"Error sending ephemeral message. Error: {e}")
         return
 
+    # send an ack for message received
+    try:
+        ack_response = f"Generating response to your question: {question}"
+        client.chat_postEphemeral(
+            channel=command["channel_id"],
+            user=command["user_id"],
+            text= ack_response,
+        )
+    except Exception as e:
+        logging.exception(f"Error sending ack ephemeral message. Error: {e}")
+
+    # get ai response
     ai_response = get_ai_response(question)
 
     try:
