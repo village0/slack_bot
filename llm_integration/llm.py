@@ -16,8 +16,9 @@ local_path = (
 # Check https://docs.gpt4all.io/gpt4all_python.html for supported backends
 llm = GPT4All(model=local_path, backend="gptj")
 
-TEMPLATE = """Question :{question}
-Answer: Answer only the question asked. Do not add extra questions or details to the answer."""
+TEMPLATE = """
+You are smart AI assistant. You will try to answer the questions or perform the task in best possible way
+Question/Task :{question}"""
 
 prompt = PromptTemplate(template=TEMPLATE, input_variables=["question"])
 llm_chain = LLMChain(prompt=prompt, llm=llm)
