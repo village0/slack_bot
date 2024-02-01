@@ -1,7 +1,5 @@
-from utils import create_response_blocks, get_ai_response
+from slack_integration.utils import create_response_blocks, get_ai_response
 import logging
-
-from constants import ASK_AI_COMMAND
 
 
 def askai(ack, command, client):
