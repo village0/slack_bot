@@ -1,88 +1,115 @@
 import os
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
-from langchain_community.llms import GPT4All
-from langchain_core.output_parsers import StrOutputParser
-from slack_bolt import App
+import pyperclip
+import requests
 from dotenv import load_dotenv
+from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-load_dotenv()
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-
-local_path = (
-    os.getenv('MODEL_PATH')
-    # replace with your desired local file path
-)
-
-import re
+# Load environment variables
+load_dotenv(dotenv_path=".env.sample")
 
 # Initialize the Bolt app with the token and signing secret
-app = App(token=os.getenv('SLACK_APP_TOKEN'))
-# If you want to use a custom model add the backend parameter
-# Check https://docs.gpt4all.io/gpt4all_python.html for supported backends
-llm = GPT4All(model=local_path, backend="gptj")
+app = App(token=os.getenv("SLACK_BOT_TOKEN"))
 
-template = """Text :{question} 
-Answer: Summarize the Slack Conversation above in English under 100 words"""
-
-prompt = PromptTemplate(template=template, input_variables=["question"])
-llm_chain = LLMChain(prompt=prompt, llm=llm)
+# Define action IDs as constants
+REGENERATE_RESPONSE = "regenerateResponse"
+COPY_TEXT = "copyText"
+GOOD_RESPONSE = "goodResponse"
+BAD_RESPONSE = "badResponse"
 
 
-def llm_prompt(question):
-    return llm_chain.invoke({"question": question})
+def get_ai_response(question):
+    """Generate a response from the AI."""
+    return f"This is the response from AI {question}"
 
 
-def summarize_text(text):
-    # Clean the text by removing emojis and images
-    clean_text = re.sub(r':[^:]+:', '', text)  # Removes Slack emojis
-    clean_text = re.sub(r'<[^>]+>', '', clean_text)  # Removes image URLs or any Slack-specific markup
-    print(clean_text)
-    return llm_prompt(question=clean_text)
+def create_button_block(text, action_id, value):
+    """Create a button block for a Slack message."""
+    return {
+        "type": "button",
+        "text": {"type": "plain_text", "text": text},
+        "action_id": action_id,
+        "value": value if value else action_id,
+    }
 
 
-@app.shortcut("summarize_gpt")
-def mention(ack, payload, respond, client):
+def create_blocks(question, ai_response):
+    """Create the blocks for a Slack message."""
+    return [
+        {"type": "section", "text": {"type": "mrkdwn", "text": ai_response}},
+        {"type": "divider"},
+        {
+            "type": "actions",
+            "elements": [
+                create_button_block("Regenerate", REGENERATE_RESPONSE, question),
+                create_button_block("Copy", COPY_TEXT, ai_response),
+                create_button_block("Good", GOOD_RESPONSE, ai_response),
+                create_button_block("Bad", BAD_RESPONSE, ai_response),
+            ],
+        },
+    ]
+
+
+@app.command("/askai")
+def askai(ack, command, client):
+    """Handle the /askai command."""
     ack()
-    print("Bot mentioned")
-    channel_id = payload["channel"]['id']
-    thread_ts = payload["message_ts"]
+    question = command["text"]
 
-    # Fetch the messages from the thread
-    response = client.conversations_replies(channel=channel_id, ts=thread_ts)
-    messages = response["messages"]
+    if not question:
+        client.chat_postEphemeral(
+            channel=command["channel_id"],
+            user=command["user_id"],
+            text="Please provide a question",
+        )
+        return
 
-    if len(messages) > 1:
-        thread_ts = messages[1]['ts']
-
-        # Concatenate the text from the messages with the username
-    text = " ".join(
-        f'{client.users_info(user=message["user"])["user"]["real_name"]}: {message["text"]}' for message in
-        messages)
-
-    respond(text='Generating Summary...', thread_ts=thread_ts, response_type='ephemeral', delete_original=True,
-            replace_original=True)
-    summary = summarize_text(text)
-    # Send the summary in the same thread
-    respond(summary['text'], thread_ts=thread_ts, response_type='ephemeral', delete_original=True,
-            replace_original=True)
+    ai_response = get_ai_response(question)
+    client.chat_postEphemeral(
+        channel=command["channel_id"],
+        user=command["user_id"],
+        text=ai_response,
+        blocks=create_blocks(question, ai_response),
+    )
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    # print(llm_chain.run({ "question": "It is a long established fact that a reader will be distracted by the
-    # readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a
-    # more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look
-    # like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their
-    # default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various
-    # versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the
-    # like)."}))
+@app.action(REGENERATE_RESPONSE)
+def regenerate(ack, body):
+    """Handle the regenerateResponse action."""
+    ack()
 
-    SocketModeHandler(app, os.getenv('SLACK_OAUTH_TOKEN')).start()
+    question = body["actions"][0]["value"]
+    ai_response = get_ai_response(question)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    requests.post(
+        body["response_url"],
+        json={
+            "replace_original": True,
+            "text": ai_response,
+            "blocks": create_blocks(question, ai_response),
+        },
+    )
+
+
+@app.action(COPY_TEXT)
+def copyText(ack, body):
+    """Handle the copyText action."""
+    ack()
+    ai_response = body["actions"][0]["value"]
+    pyperclip.copy(ai_response)
+
+
+@app.action(GOOD_RESPONSE)
+def goodResponse(ack, body):
+    """Handle the goodResponse action."""
+    ack()
+
+
+@app.action(BAD_RESPONSE)
+def badResponse(ack, body):
+    """Handle the badResponse action."""
+    ack()
+
+
+if __name__ == "__main__":
+    SocketModeHandler(app, os.getenv("SLACK_APP_TOKEN")).start()
