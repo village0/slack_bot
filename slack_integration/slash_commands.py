@@ -1,5 +1,6 @@
-from slack_integration.utils import create_response_blocks, get_ai_response
 import logging
+
+from slack_integration.utils import create_response_blocks, get_ai_response
 
 
 def askai(ack, command, client):
@@ -24,7 +25,7 @@ def askai(ack, command, client):
         client.chat_postEphemeral(
             channel=command["channel_id"],
             user=command["user_id"],
-            text= ack_response,
+            text=ack_response,
         )
     except Exception as e:
         logging.exception(f"Error sending ack ephemeral message. Error: {e}")

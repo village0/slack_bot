@@ -1,3 +1,5 @@
+import logging
+
 from slack_integration.constants import (
     BAD_RESPONSE,
     GOOD_RESPONSE,
@@ -43,3 +45,28 @@ def create_response_blocks(question, ai_response, is_ephemeral=False):
             ],
         },
     ]
+
+
+def send_slack_message(client, channel, text, blocks=None, metadata=None):
+    try:
+        return client.chat_postMessage(
+            channel=channel,
+            text=text,
+            blocks=blocks,
+            metadata={"event_type": "direct_message", "event_payload": metadata},
+        )
+    except Exception as e:
+        logging.exception(f"Error sending message: {e}")
+
+
+def update_slack_message(client, channel, ts, text, blocks=None, metadata=None):
+    try:
+        client.chat_update(
+            channel=channel,
+            ts=ts,
+            text=text,
+            blocks=blocks,
+            metadata={"event_type": "direct_message", "event_payload": metadata},
+        )
+    except Exception as e:
+        logging.exception(f"Error updating message: {e}")
