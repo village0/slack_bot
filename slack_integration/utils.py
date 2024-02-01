@@ -1,4 +1,4 @@
-from constants import (
+from slack_integration.constants import (
     BAD_RESPONSE,
     GOOD_RESPONSE,
     REGENERATE_RESPONSE_EPHEMERAL,
