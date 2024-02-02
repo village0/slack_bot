@@ -15,6 +15,9 @@ def handle_direct_message(client, event):
         send_slack_message(client, event["channel"], "Please provide a question")
         return
 
+    if event["channel_type"] != "im":
+        return
+
     # Send an ack for message received
     ack_response = f"Generating response to your question: {question}"
     loading_message = send_slack_message(client, event["channel"], ack_response)
