@@ -3,6 +3,9 @@
 venv
 
 .idea
+**.pid
+/temp
+**.log
 
 *.code-workspace
 

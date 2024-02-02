@@ -9,6 +9,16 @@ Not Production ready ! MVP code that requires a complete revamp
 - Add variables to .env
 - `python main.py` To start slack bolt
 
+# Instructions for non programmers
+- Install python3.8
+- Install virtual env `python3 -m venv venv`
+- run `pip install -r requirements.txt`
+- copy .env.sample file and create new file named .env with correct values
+- Run `supervisord` or `supervisord -n` with logs 
+- You can view logs in supervisord.log file
+- You can view background process id in supervisord.pid and kill it using `kill <id from supervisord.pid>`
+- Use `supervisorctl` to view status of background process for slack bot
+
 
 ## Getting started
 
