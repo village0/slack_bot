@@ -11,6 +11,7 @@ from llm_integration.llm import get_llm_answer
 
 def get_ai_response(question):
     """Returns a response from the LLM."""
+    print("I am here")
     return get_llm_answer(question)
 
 
