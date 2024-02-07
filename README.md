@@ -19,6 +19,13 @@ Not Production ready ! MVP code that requires a complete revamp
 - You can view background process id in supervisord.pid and kill it using `kill <id from supervisord.pid>`
 - Use `supervisorctl` to view status of background process for slack bot
 
+# Demo 
+
+
+https://github.com/village0/slack_bot/assets/28826599/3918ac62-c54d-45af-9362-e806e3e8bb53
+
+
+
 
 ## Getting started
 
