@@ -16,6 +16,11 @@ def regenerate_response_ephemeral(ack, body):
 
     ai_response = get_ai_response(question)
 
+    if not ai_response:
+        ai_response = """
+        Could not generate a response, please try again later, or rephrase your question.
+        """
+
     try:
         requests.post(
             body["response_url"],
@@ -51,6 +56,11 @@ def regenerate_response_message(ack, body):
         return
 
     ai_response = get_ai_response(question)
+
+    if not ai_response:
+        ai_response = """
+        Could not generate a response, please try again later, or rephrase your question.
+        """
 
     try:
         requests.post(

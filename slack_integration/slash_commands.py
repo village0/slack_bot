@@ -33,6 +33,11 @@ def askai(ack, command, client):
     # get ai response
     ai_response = get_ai_response(question)
 
+    if not ai_response:
+        ai_response = """
+        Could not generate a response, please try again later, or rephrase your question.
+        """
+
     try:
         client.chat_postEphemeral(
             channel=command["channel_id"],
