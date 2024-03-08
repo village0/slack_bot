@@ -35,8 +35,8 @@ def llm_prompt(question):
 def get_llm_answer(text):
     """Cleans the question text and makes a call to get response from model"""
     # Clean the text by removing emojis and images
-    clean_text = re.sub(r':[^:]+:', '', text)  # Removes Slack emojis
-    clean_text = re.sub(r'<[^>]+>', '', clean_text)  # Removes image URLs or any Slack-specific markup
+    clean_text = re.sub(r'<[^>]+>', '', text)  # Removes image URLs or any Slack-specific markup
+    clean_text = re.sub(r':[^:]+:', '', clean_text)  # Removes Slack emojis
     # Replace double quotes with another symbol
     clean_text = re.sub(r'"([^"]*)"', r'<\1>', clean_text)
     return llm_prompt(question=clean_text)
