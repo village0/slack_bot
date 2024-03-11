@@ -17,7 +17,8 @@ local_path = (
 llm = GPT4All(model=local_path, backend="gptj")
 
 TEMPLATE = """
-You are smart AI assistant. You will try to answer the questions or perform the task in best possible way
+You are smart AI assistant. You will answer the question or perform the task in best possible way.
+Do not try to complete the user question or add onto it, just answer it or perform the task.
 Question/Task :{question}"""
 
 prompt = PromptTemplate(template=TEMPLATE, input_variables=["question"])
@@ -34,6 +35,8 @@ def llm_prompt(question):
 def get_llm_answer(text):
     """Cleans the question text and makes a call to get response from model"""
     # Clean the text by removing emojis and images
-    clean_text = re.sub(r':[^:]+:', '', text)  # Removes Slack emojis
-    clean_text = re.sub(r'<[^>]+>', '', clean_text)  # Removes image URLs or any Slack-specific markup
+    clean_text = re.sub(r'<[^>]+>', '', text)  # Removes image URLs or any Slack-specific markup
+    clean_text = re.sub(r':[^:]+:', '', clean_text)  # Removes Slack emojis
+    # Replace double quotes with another symbol
+    clean_text = re.sub(r'"([^"]*)"', r'<\1>', clean_text)
     return llm_prompt(question=clean_text)

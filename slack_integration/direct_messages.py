@@ -22,6 +22,11 @@ def handle_direct_message(client, event):
     # Get AI response
     ai_response = get_ai_response(question)
 
+    if not ai_response:
+        ai_response = """
+        Could not generate a response, please try again later, or rephrase your question.
+        """
+
     if loading_message is None:
         send_slack_message(
             client,
