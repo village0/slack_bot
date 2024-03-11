@@ -47,6 +47,3 @@ class TestLLMPrompt(unittest.TestCase):
             mock_llm_prompt.return_value = "Response"
             get_llm_answer(question)
             mock_llm_prompt.assert_called_once_with(question=expected_clean_text)
-
-if __name__ == '__main__':
-    unittest.main()
