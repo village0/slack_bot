@@ -15,5 +15,5 @@ def get_evaluation(testing_assistant, user_message, bot_response, ideal_response
 
     # If the option is A, B, or C answer in "yes" else "no".
     if "A" in evaluation_text  or "B" in evaluation_text  or "C" in evaluation_text:
-        return "yes"
-    return "no"
+        return True
+    return False
