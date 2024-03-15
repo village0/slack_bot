@@ -10,7 +10,6 @@ class TestLLMPrompt(unittest.TestCase):
     This class contains unit tests for the get_llm_answer and llm_prompt function in the 
     llm_integration.llm module. 
     """
-
     def test_get_llm_answer_clean_text(self):
         """Test the get_llm_answer function with cleaned text."""
         question = 'How are you? :smiley:'
