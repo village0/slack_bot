@@ -13,7 +13,9 @@ def get_evaluation(testing_assistant, user_message, bot_response, ideal_response
     evaluation_text = evaluation_response["text"]
     print("Evaluation AI Generated Response:", evaluation_text)
 
-    # If the option is A, B, or C answer in "yes" else "no".
-    if "A" in evaluation_text  or "B" in evaluation_text  or "C" in evaluation_text:
+    valid_options = ["A", "B", "C"]
+
+    # If the option is A, B, or C, test passes
+    if any(x in evaluation_text for x in valid_options):
         return True
     return False
