@@ -6,21 +6,21 @@ from slack_integration.utils import (
 )
 
 
-def handle_direct_message(client, event):
+async def handle_direct_message(client, event):
     """Handle a direct message event."""
     print(event)
     question = event["text"]
 
     if not question:
-        send_slack_message(client, event["channel"], "Please provide a question")
+        await send_slack_message(client, event["channel"], "Please provide a question")
         return
 
     # Send an ack for message received
     ack_response = f"Generating response to your question: {question}"
-    loading_message = send_slack_message(client, event["channel"], ack_response)
+    loading_message = await send_slack_message(client, event["channel"], ack_response)
 
     # Get AI response
-    ai_response = get_ai_response(question)
+    ai_response = await get_ai_response(question)
 
     if not ai_response:
         ai_response = """
@@ -28,7 +28,7 @@ def handle_direct_message(client, event):
         """
 
     if loading_message is None:
-        send_slack_message(
+        await send_slack_message(
             client,
             event["channel"],
             ai_response,
@@ -36,7 +36,7 @@ def handle_direct_message(client, event):
             metadata=event,
         )
     else:
-        update_slack_message(
+        await update_slack_message(
             client,
             event["channel"],
             loading_message["ts"],

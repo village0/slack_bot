@@ -25,18 +25,18 @@ prompt = PromptTemplate(template=TEMPLATE, input_variables=["question"])
 llm_chain = LLMChain(prompt=prompt, llm=llm)
 
 
-def llm_prompt(question):
+async def llm_prompt(question):
     """Generates a response from model"""
-    response = llm_chain.invoke({"question": question})
+    response = await llm_chain.ainvoke({"question": question})
     print("AI Generated Response:", response["text"])
     return response["text"]
 
 
-def get_llm_answer(text):
+async def get_llm_answer(text):
     """Cleans the question text and makes a call to get response from model"""
     # Clean the text by removing emojis and images
     clean_text = re.sub(r'<[^>]+>', '', text)  # Removes image URLs or any Slack-specific markup
     clean_text = re.sub(r':[^:]+:', '', clean_text)  # Removes Slack emojis
     # Replace double quotes with another symbol
     clean_text = re.sub(r'"([^"]*)"', r'<\1>', clean_text)
-    return llm_prompt(question=clean_text)
+    return await llm_prompt(question=clean_text)

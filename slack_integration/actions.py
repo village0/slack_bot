@@ -5,7 +5,7 @@ import requests
 from slack_integration.utils import create_response_blocks, get_ai_response
 
 
-def regenerate_response_ephemeral(ack, body):
+async def regenerate_response_ephemeral(ack, body):
     """Handle the regenerateResponse action."""
     ack()
 
@@ -14,7 +14,7 @@ def regenerate_response_ephemeral(ack, body):
         logging.error("No question provided")
         return
 
-    ai_response = get_ai_response(question)
+    ai_response = await get_ai_response(question)
 
     if not ai_response:
         ai_response = """
@@ -46,7 +46,7 @@ def bad_response(ack, body):
     ack()
 
 
-def regenerate_response_message(ack, body):
+async def regenerate_response_message(ack, body):
     """Handle the regenerateResponse action."""
     ack()
     question = body["message"]["metadata"]["event_payload"]["text"]
@@ -55,7 +55,7 @@ def regenerate_response_message(ack, body):
         logging.error("No question provided")
         return
 
-    ai_response = get_ai_response(question)
+    ai_response = await get_ai_response(question)
 
     if not ai_response:
         ai_response = """

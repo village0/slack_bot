@@ -9,9 +9,9 @@ from slack_integration.constants import (
 from llm_integration.llm import get_llm_answer
 
 
-def get_ai_response(question):
+async def get_ai_response(question):
     """Returns a response from the LLM."""
-    return get_llm_answer(question)
+    return await get_llm_answer(question)
 
 
 def create_button_block(text, action_id, value):
@@ -47,9 +47,9 @@ def create_response_blocks(question, ai_response, is_ephemeral=False):
     ]
 
 
-def send_slack_message(client, channel, text, blocks=None, metadata=None):
+async def send_slack_message(client, channel, text, blocks=None, metadata=None):
     try:
-        return client.chat_postMessage(
+        return await client.async_chat_postMessage(
             channel=channel,
             text=text,
             blocks=blocks,
@@ -59,9 +59,9 @@ def send_slack_message(client, channel, text, blocks=None, metadata=None):
         logging.exception(f"Error sending message: {e}")
 
 
-def update_slack_message(client, channel, ts, text, blocks=None, metadata=None):
+async def update_slack_message(client, channel, ts, text, blocks=None, metadata=None):
     try:
-        client.chat_update(
+        await client.async_chat_update(
             channel=channel,
             ts=ts,
             text=text,
