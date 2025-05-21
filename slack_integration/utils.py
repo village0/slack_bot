@@ -6,12 +6,23 @@ from slack_integration.constants import (
     REGENERATE_RESPONSE_EPHEMERAL,
     REGENERATE_RESPONSE_MESSAGE,
 )
-from llm_integration.llm import get_llm_answer
+from llm_integration.llm import get_llm_answer, llm_summarize
+import re
 
 
 async def get_ai_response(question):
     """Returns a response from the LLM."""
     return await get_llm_answer(question)
+
+
+async def get_ai_summary(text_to_summarize: str):
+    """Cleans the text and makes a call to get a summary from the LLM."""
+    # Clean the text by removing emojis and images
+    clean_text = re.sub(r'<[^>]+>', '', text_to_summarize)  # Removes image URLs or any Slack-specific markup
+    clean_text = re.sub(r':[^:]+:', '', clean_text)  # Removes Slack emojis
+    # Replace double quotes with another symbol (though less critical for summarization input)
+    clean_text = re.sub(r'"([^"]*)"', r'<\1>', clean_text)
+    return await llm_summarize(text_to_summarize=clean_text)
 
 
 def create_button_block(text, action_id, value):

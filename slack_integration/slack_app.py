@@ -18,9 +18,10 @@ from slack_integration.constants import (
     INBOX_MESSAGE_EVENT,
     REGENERATE_RESPONSE_EPHEMERAL,
     REGENERATE_RESPONSE_MESSAGE,
+    SUMMARIZE_COMMAND,
 )
 from slack_integration.direct_messages import handle_direct_message
-from slack_integration.slash_commands import askai
+from slack_integration.slash_commands import askai, summarize_channel_messages
 
 # Initialize logging
 logging.basicConfig(level=logging.DEBUG)
@@ -38,6 +39,7 @@ app.action(REGENERATE_RESPONSE_EPHEMERAL)(regenerate_response_ephemeral)
 app.action(GOOD_RESPONSE)(good_response)
 app.action(BAD_RESPONSE)(bad_response)
 app.action(REGENERATE_RESPONSE_MESSAGE)(regenerate_response_message)
+app.command(SUMMARIZE_COMMAND)(summarize_channel_messages)
 
 
 @app.error

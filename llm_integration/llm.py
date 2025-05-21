@@ -24,6 +24,15 @@ Question/Task :{question}"""
 prompt = PromptTemplate(template=TEMPLATE, input_variables=["question"])
 llm_chain = LLMChain(prompt=prompt, llm=llm)
 
+# Summarization specific prompt and chain
+SUMMARIZATION_TEMPLATE = """
+You are an AI assistant tasked with summarizing a conversation.
+Provide a concise summary of the following messages:
+{conversation_text}
+Summary:"""
+summarization_prompt = PromptTemplate(template=SUMMARIZATION_TEMPLATE, input_variables=["conversation_text"])
+llm_summarization_chain = LLMChain(prompt=summarization_prompt, llm=llm)
+
 
 async def llm_prompt(question):
     """Generates a response from model"""
@@ -40,3 +49,10 @@ async def get_llm_answer(text):
     # Replace double quotes with another symbol
     clean_text = re.sub(r'"([^"]*)"', r'<\1>', clean_text)
     return await llm_prompt(question=clean_text)
+
+
+async def llm_summarize(text_to_summarize):
+    """Generates a summary from the model using the summarization chain"""
+    response = await llm_summarization_chain.ainvoke({"conversation_text": text_to_summarize})
+    print("AI Generated Summary:", response["text"])
+    return response["text"]
